@@ -3,7 +3,10 @@
 import db from "@/db/drizzle";
 import { getCourseById, getUserProgress } from "@/db/queries";
 import { userProgress } from "@/db/schema";
-import { auth, currentUser } from "@clerk/nextjs";
+import { auth, currentUser } from "@clerk/nextjs/server";
+// import { auth, currentUser } from "@clerk/nextjs";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 export const upsertUserProgress = async (courseId: number) => {
     const { userId } = await auth();
@@ -30,6 +33,10 @@ export const upsertUserProgress = async (courseId: number) => {
             userName: user.firstName || "User",
             userImageSrc: user?.imageUrl || "/mascot.svg",
         });
+
+        revalidatePath("/courses");
+        revalidatePath("/learn");
+        redirect("/learn");
     }
 
     await db.insert(userProgress).values({
@@ -38,4 +45,8 @@ export const upsertUserProgress = async (courseId: number) => {
         userName: user?.firstName || "User",
         userImageSrc: user?.imageUrl || "/mascot.svg",
     });
+
+    revalidatePath("/courses");
+    revalidatePath("/learn");
+    redirect("/learn");
 }

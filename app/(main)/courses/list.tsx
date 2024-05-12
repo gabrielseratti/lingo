@@ -4,6 +4,8 @@ import { courses, userProgress } from "@/db/schema"
 import { Card } from "./card";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
+import { upsertUserProgress } from "@/actions/user-progress";
+import { toast } from "sonner";
 
 type Props = {
     courses: typeof courses.$inferInsert[];
@@ -22,7 +24,8 @@ export const List = ({ courses, activeCourseId }: Props) => {
         }
 
         startTransition(() => {
-
+            upsertUserProgress(id)
+            .catch(() => toast.error("Something went wrong"))
         });
     }
 
@@ -34,7 +37,7 @@ export const List = ({ courses, activeCourseId }: Props) => {
                     id={course.id}
                     title={course.title}
                     imageSrc={course.imageSrc}
-                    onClick={() => {}}
+                    onClick={onClick}
                     disabled={false}
                     active={course.id === activeCourseId}
                 />
